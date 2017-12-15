@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,height=device-height">
+    <title>多条折线图</title>
+    <style>::-webkit-scrollbar{display:none;}html,body{overflow:hidden;height:100%;}</style>
+</head>
+<body>
+<div id="mountNode"></div>
+<script>/*Fixing iframe window.innerHeight 0 issue in Safari*/document.body.clientHeight;</script>
+<script src="https://gw.alipayobjects.com/os/antv/assets/g2/3.0.2/g2.min.js"></script>
+<script src="https://gw.alipayobjects.com/os/antv/assets/data-set/0.8.0/data-set.min.js"></script>
+<script>
+  const data = [
+    { time: '00:00-00:29', 今日成交金额: 1117.0, 昨日成交金额: 883.9 },
+    { time: '03:00-03:29', 今日成交金额: 1227.0, 昨日成交金额: 993.9 },
+    { time: '06:00-06:29', 今日成交金额: 1337.0, 昨日成交金额: 1003.9 },
+    { time: '09:00-09:29', 今日成交金额: 1447.0, 昨日成交金额: 1103.9 },
+    { time: '12:00-12:29', 今日成交金额: 1227.0, 昨日成交金额: 1113.9 },
+    { time: '15:00-15:29', 今日成交金额: 1447.0, 昨日成交金额: 1223.9 },
+    { time: '18:00-18:29', 今日成交金额: 1557.0, 昨日成交金额: 1333.9 },
+    { time: '21:00-21:29', 今日成交金额: 1667.0, 昨日成交金额: 1233.9 },
+  ];
+  const ds = new DataSet();
+  const dv = ds.createView().source(data);
+  dv.transform({
+    type: 'fold',
+    fields: [ '今日成交金额', '昨日成交金额' ], // 展开字段集
+    key: 'date', // key字段
+    value: 'money', // value字段
+  });
+  const chart = new G2.Chart({
+    container: 'mountNode',
+    forceFit: true,
+    height: window.innerHeight
+  });
+  chart.source(dv,{
+    month: {
+      range: [ 0, 1 ]
+    }
+  });
+  chart.tooltip({
+    crosshairs: {
+      type: 'line'
+    }
+  });
+  chart.axis('money', {
+    label: {
+      formatter: val => {
+        return val + '万';
+      }
+    }
+  });
+  chart.line().position('time*money').shape('spline').color('date',['#828fa3','#b1b8c7']);
+  chart.point().position('time*money').color('date',['#828fa3','#b1b8c7']).size(4).shape('circle').style({
+    stroke: '#fff',
+    lineWidth: 1
+  });
+  chart.legend({
+  position:'top'});
+  chart.render();
+</script>
+</body>
+</html>
